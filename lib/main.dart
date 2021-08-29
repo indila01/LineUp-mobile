@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:line_up_mobile/screens/calender.dart';
 import 'package:line_up_mobile/screens/login_screen.dart';
 
 void main() {
@@ -16,7 +17,7 @@ class MyApp extends StatelessWidget {
         primaryColor: Color.fromRGBO(255, 191, 59, 1),
         primarySwatch: Colors.blue,
       ),
-      home: LoginScreen(),
+      home: Calender(),
     );
   }
 }
