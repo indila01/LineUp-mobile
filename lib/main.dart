@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:line_up_mobile/models/app_state.dart';
+import 'package:line_up_mobile/redux/actions.dart';
 import 'package:line_up_mobile/redux/reducers.dart';
 import 'package:line_up_mobile/screens/batch_screen.dart';
 import 'package:line_up_mobile/screens/calender.dart';
@@ -27,7 +28,11 @@ class MyApp extends StatelessWidget {
         child: MaterialApp(
           title: 'Line up',
           routes: {
-            '/batches': (BuildContext context) => BatchScreen(),
+            '/batches': (BuildContext context) => BatchScreen(onInit: () {
+                  StoreProvider.of<AppState>(context).dispatch(getUserAction);
+                  StoreProvider.of<AppState>(context)
+                      .dispatch(getBatchesAction);
+                }),
             '/login': (BuildContext context) => LoginScreen()
           },
           debugShowCheckedModeBanner: false,
