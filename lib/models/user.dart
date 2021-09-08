@@ -1,62 +1,29 @@
-class User {
-  final String id;
-  final String firstName;
-  final String lastName;
-  final String email;
-  final String address;
-  final String nic;
-  final String licenseNumber;
-  final int contactNumber;
-  final bool isAdmin;
-  final bool isBlacklisted;
-  final bool isVerified;
-  final String dob;
+import 'dart:convert';
+
+UserModel welcomeFromJson(String str) => UserModel.fromJson(json.decode(str));
+
+String welcomeToJson(UserModel data) => json.encode(data.toJson());
+
+class UserModel {
+  UserModel({
+    required this.username,
+    required this.role,
+    required this.token,
+  });
+
+  final String username;
+  final String role;
   final String token;
 
-  User(
-    this.id,
-    this.firstName,
-    this.lastName,
-    this.email,
-    this.address,
-    this.nic,
-    this.licenseNumber,
-    this.contactNumber,
-    this.isAdmin,
-    this.isBlacklisted,
-    this.isVerified,
-    this.dob,
-    this.token,
-  );
-
-  User.fromJson(Map<String, dynamic> json)
-      : id = json["_id"],
-        firstName = json["firstName"],
-        lastName = json["lastName"],
-        email = json["email"],
-        address = json["address"],
-        nic = json["NIC"],
-        licenseNumber = json["licenseNumber"],
-        contactNumber = json["contactNumber"],
-        isAdmin = json["isAdmin"],
-        isBlacklisted = json["isBlacklisted"],
-        isVerified = json["isVerified"],
-        dob = json["DOB"],
-        token = json["token"];
+  factory UserModel.fromJson(Map<String, dynamic> json) => UserModel(
+        username: json["username"],
+        role: json["role"],
+        token: json["token"],
+      );
 
   Map<String, dynamic> toJson() => {
-        "_id": id,
-        "firstName": firstName,
-        "lastName": lastName,
-        "email": email,
-        "address": address,
-        "NIC": nic,
-        "licenseNumber": licenseNumber,
-        "contactNumber": contactNumber,
-        "isAdmin": isAdmin,
-        "isBlacklisted": isBlacklisted,
-        "isVerified": isVerified,
-        "DOB": dob,
+        "username": username,
+        "role": role,
         "token": token,
       };
 }
