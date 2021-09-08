@@ -113,7 +113,7 @@ class _LoginScreenState extends State<LoginScreen> {
       _storeUserData(responseData);
       _showSuccessSnack();
       _redirectUser();
-      print(responseData);
+      // print(responseData);
     } else {
       setState(() => _isSubmitting = false);
       final String errorMsg = 'Error login';
