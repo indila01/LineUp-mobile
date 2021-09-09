@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:line_up_mobile/constants/Strings.dart';
 import 'package:line_up_mobile/models/app_state.dart';
 import 'package:line_up_mobile/models/batch.dart';
+import 'package:line_up_mobile/models/profile.dart';
 import 'package:line_up_mobile/models/subject.dart';
 import 'package:line_up_mobile/models/user.dart';
 import 'package:redux_thunk/redux_thunk.dart';
@@ -75,4 +76,25 @@ class GetSubjectsAction {
   List<Subject> get subjects => this._subjects;
 
   GetSubjectsAction(this._subjects);
+}
+
+// profile Actions
+ThunkAction<AppState> getProfileAction = (Store<AppState> store) async {
+  var url = Uri.parse('${Strings.baseUrl}/api/profile');
+
+  http.Response response = await http.get(url);
+
+  final dynamic responseData = json.decode(response.body);
+  final Profile profile = Profile.fromJson(responseData);
+
+  store.dispatch(GetProfileAction(profile));
+};
+
+class GetProfileAction {
+  final Profile _profile;
+
+  Profile get profile => this._profile;
+  // get profile => this._profile;
+
+  GetProfileAction(this._profile);
 }

@@ -39,7 +39,10 @@ class MyApp extends StatelessWidget {
                       .dispatch(getSubjectsAction);
                 }),
             '/login': (BuildContext context) => LoginScreen(),
-            '/profile': (BuildContext context) => ProfileScreen()
+            '/profile': (BuildContext context) => ProfileScreen(onInit: () {
+                  StoreProvider.of<AppState>(context)
+                      .dispatch(getProfileAction);
+                })
           },
           debugShowCheckedModeBanner: false,
           theme: ThemeData(

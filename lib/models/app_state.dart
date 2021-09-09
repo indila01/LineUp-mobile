@@ -7,11 +7,16 @@ class AppState {
   final dynamic user;
   final List<Batch> batches;
   final List<Subject> subjects;
+  final dynamic profile;
 
-  AppState(
-      {@required this.user, required this.batches, required this.subjects});
+  AppState({
+    @required this.user,
+    required this.batches,
+    required this.subjects,
+    this.profile,
+  });
 
   factory AppState.initial() {
-    return AppState(user: null, batches: [], subjects: []);
+    return AppState(user: null, batches: [], subjects: [], profile: null);
   }
 }

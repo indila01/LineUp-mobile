@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:line_up_mobile/models/app_state.dart';
 import 'package:line_up_mobile/screens/batch_screen.dart';
+import 'package:line_up_mobile/screens/student_screen.dart';
 import 'package:line_up_mobile/screens/subject_screen.dart';
 import 'package:line_up_mobile/screens/timetable_screen.dart';
 import 'package:line_up_mobile/widgets/batch_item.dart';
@@ -19,7 +20,8 @@ class _HomeScreenState extends State<HomeScreen> {
   final List<Widget> _children = [
     BatchScreen(),
     SubjectScreen(),
-    TimetableScreen()
+    TimetableScreen(),
+    StudentScreen()
   ];
 
   void onTabTapped(int index) {
@@ -63,31 +65,43 @@ class _HomeScreenState extends State<HomeScreen> {
       ));
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: _appBar,
-        body: _children[_currentIndex],
-        bottomNavigationBar: BottomNavigationBar(
-          items: [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.school),
-              label: 'Batches',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(
-                Icons.auto_stories,
-              ),
-              label: 'Subjects',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(
-                Icons.event_available,
-              ),
-              label: 'TimeTable',
-            ),
-          ],
-          currentIndex: _currentIndex,
-          selectedItemColor: Colors.amber[800],
-          onTap: onTabTapped,
-        ));
+    return Container(
+        child: StoreConnector<AppState, AppState>(
+            converter: (store) => store.state,
+            builder: (_, state) {
+              return Scaffold(
+                  appBar: _appBar,
+                  body: _children[_currentIndex],
+                  bottomNavigationBar: BottomNavigationBar(
+                    items: [
+                      BottomNavigationBarItem(
+                        icon: Icon(Icons.school),
+                        label: 'Batches',
+                      ),
+                      BottomNavigationBarItem(
+                        icon: Icon(
+                          Icons.auto_stories,
+                        ),
+                        label: 'Subjects',
+                      ),
+                      BottomNavigationBarItem(
+                        icon: Icon(
+                          Icons.event_available,
+                        ),
+                        label: 'TimeTable',
+                      ),
+                      if (state.user != null && state.user.role != 'STUDENT')
+                        (BottomNavigationBarItem(
+                          icon: Icon(
+                            Icons.people,
+                          ),
+                          label: 'students',
+                        )),
+                    ],
+                    currentIndex: _currentIndex,
+                    selectedItemColor: Colors.amber[800],
+                    onTap: onTabTapped,
+                  ));
+            }));
   }
 }
