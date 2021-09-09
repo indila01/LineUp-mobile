@@ -8,6 +8,20 @@ class BatchItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(item.batchCode);
+    return Container(
+      height: 100,
+      child: Card(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            ListTile(
+              leading: Icon(Icons.school_outlined),
+              title: Text('${item.batchCode} (${item.year})'),
+              subtitle: Text(item.course),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

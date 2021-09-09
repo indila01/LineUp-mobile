@@ -158,6 +158,7 @@ class _LoginScreenState extends State<LoginScreen> {
       key: _scafoldKey,
       appBar: AppBar(
         title: Text('Sign In'),
+        centerTitle: true,
       ),
       body: Container(
         padding: EdgeInsets.symmetric(horizontal: 20.0),

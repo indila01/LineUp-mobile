@@ -7,11 +7,13 @@ import 'package:line_up_mobile/screens/batch_screen.dart';
 import 'package:line_up_mobile/screens/calender.dart';
 import 'package:line_up_mobile/screens/login_screen.dart';
 import 'package:redux/redux.dart';
+import 'package:redux_logging/redux_logging.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 
 void main() {
   final store = Store<AppState>(appRudecer,
-      initialState: AppState.initial(), middleware: [thunkMiddleware]);
+      initialState: AppState.initial(),
+      middleware: [thunkMiddleware, LoggingMiddleware.printer()]);
   runApp(MyApp(
     store: store,
   ));
