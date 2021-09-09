@@ -149,7 +149,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   void _redirectUser() {
     Future.delayed(Duration(seconds: 1), () {
-      Navigator.pushReplacementNamed(context, '/batches');
+      Navigator.pushReplacementNamed(context, '/home');
     });
   }
 

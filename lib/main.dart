@@ -3,9 +3,10 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:line_up_mobile/models/app_state.dart';
 import 'package:line_up_mobile/redux/actions.dart';
 import 'package:line_up_mobile/redux/reducers.dart';
-import 'package:line_up_mobile/screens/batch_screen.dart';
+import 'package:line_up_mobile/screens/home_screen.dart';
 import 'package:line_up_mobile/screens/calender.dart';
 import 'package:line_up_mobile/screens/login_screen.dart';
+import 'package:line_up_mobile/screens/profile_screen.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_logging/redux_logging.dart';
 import 'package:redux_thunk/redux_thunk.dart';
@@ -30,17 +31,20 @@ class MyApp extends StatelessWidget {
         child: MaterialApp(
           title: 'Line up',
           routes: {
-            '/batches': (BuildContext context) => BatchScreen(onInit: () {
+            '/home': (BuildContext context) => HomeScreen(onInit: () {
                   StoreProvider.of<AppState>(context).dispatch(getUserAction);
                   StoreProvider.of<AppState>(context)
                       .dispatch(getBatchesAction);
+                  StoreProvider.of<AppState>(context)
+                      .dispatch(getSubjectsAction);
                 }),
-            '/login': (BuildContext context) => LoginScreen()
+            '/login': (BuildContext context) => LoginScreen(),
+            '/profile': (BuildContext context) => ProfileScreen()
           },
           debugShowCheckedModeBanner: false,
           theme: ThemeData(
               brightness: Brightness.dark,
-              primaryColor: Colors.amber[600],
+              primaryColor: Colors.amber[700],
               primarySwatch: Colors.blue,
               accentColor: Colors.lightBlue[500],
               textTheme: TextTheme(

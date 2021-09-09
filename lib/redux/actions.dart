@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:line_up_mobile/constants/Strings.dart';
 import 'package:line_up_mobile/models/app_state.dart';
 import 'package:line_up_mobile/models/batch.dart';
+import 'package:line_up_mobile/models/subject.dart';
 import 'package:line_up_mobile/models/user.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 import 'package:redux/redux.dart';
@@ -31,6 +32,7 @@ class GetUserAction {
 // batches Actions
 ThunkAction<AppState> getBatchesAction = (Store<AppState> store) async {
   var url = Uri.parse('${Strings.baseUrl}/api/batches');
+
   http.Response response = await http.get(url);
 
   final List<dynamic> responseData = json.decode(response.body);
@@ -49,4 +51,28 @@ class GetBatchesAction {
   List<Batch> get batches => this._batches;
 
   GetBatchesAction(this._batches);
+}
+
+// subject Actions
+ThunkAction<AppState> getSubjectsAction = (Store<AppState> store) async {
+  var url = Uri.parse('${Strings.baseUrl}/api/subjects');
+
+  http.Response response = await http.get(url);
+
+  final List<dynamic> responseData = json.decode(response.body);
+  List<Subject> subjects = [];
+
+  responseData.forEach((subjectData) {
+    final Subject subject = Subject.fromJson(subjectData);
+    subjects.add(subject);
+  });
+  store.dispatch(GetSubjectsAction(subjects));
+};
+
+class GetSubjectsAction {
+  final List<Subject> _subjects;
+
+  List<Subject> get subjects => this._subjects;
+
+  GetSubjectsAction(this._subjects);
 }
