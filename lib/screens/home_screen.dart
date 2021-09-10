@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:line_up_mobile/models/app_state.dart';
+import 'package:line_up_mobile/redux/actions.dart';
 import 'package:line_up_mobile/screens/batch_screen.dart';
 import 'package:line_up_mobile/screens/student_screen.dart';
 import 'package:line_up_mobile/screens/subject_screen.dart';
 import 'package:line_up_mobile/screens/timetable_screen.dart';
-import 'package:line_up_mobile/widgets/batch_item.dart';
 
 class HomeScreen extends StatefulWidget {
   final void Function() onInit;
@@ -54,11 +54,18 @@ class _HomeScreenState extends State<HomeScreen> {
             actions: [
               Padding(
                   padding: EdgeInsets.only(right: 12.0),
-                  child: state.user != null
-                      ? IconButton(
-                          icon: Icon(Icons.exit_to_app),
-                          onPressed: () => print('logout'))
-                      : Text(''))
+                  child: StoreConnector<AppState, VoidCallback>(
+                      converter: (store) {
+                    return () => {
+                          store.dispatch(logoutUserAction),
+                          Navigator.pushReplacementNamed(context, '/login')
+                        };
+                  }, builder: (_, callback) {
+                    return state.user != null
+                        ? IconButton(
+                            icon: Icon(Icons.exit_to_app), onPressed: callback)
+                        : Text('');
+                  }))
             ],
           );
         },

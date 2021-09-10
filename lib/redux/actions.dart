@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:http/http.dart' as http;
 import 'package:line_up_mobile/constants/Strings.dart';
 import 'package:line_up_mobile/models/app_state.dart';
@@ -7,6 +6,7 @@ import 'package:line_up_mobile/models/batch.dart';
 import 'package:line_up_mobile/models/profile.dart';
 import 'package:line_up_mobile/models/subject.dart';
 import 'package:line_up_mobile/models/user.dart';
+
 import 'package:redux_thunk/redux_thunk.dart';
 import 'package:redux/redux.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -22,6 +22,17 @@ ThunkAction<AppState> getUserAction = (Store<AppState> store) async {
   store.dispatch(GetUserAction(user!));
 };
 
+ThunkAction<AppState> logoutUserAction = (Store<AppState> store) async {
+  final prefs = await SharedPreferences.getInstance();
+  await prefs.remove('user');
+  await prefs.remove('batches');
+  await prefs.remove('subjects');
+  await prefs.remove('profile');
+  User? user;
+
+  store.dispatch(LogoutUserAction(user));
+};
+
 class GetUserAction {
   final User _user;
 
@@ -30,11 +41,30 @@ class GetUserAction {
   GetUserAction(this._user);
 }
 
+class LogoutUserAction {
+  final User? _user;
+
+  User? get user => this._user;
+
+  LogoutUserAction(this._user);
+}
+
 // batches Actions
 ThunkAction<AppState> getBatchesAction = (Store<AppState> store) async {
+//get token
+  final prefs = await SharedPreferences.getInstance();
+  final String? storedUser = prefs.getString('user');
+
+  if (storedUser == null) {
+    return;
+  }
+
+  final User user = User.fromJson(json.decode(storedUser));
+
   var url = Uri.parse('${Strings.baseUrl}/api/batches');
 
-  http.Response response = await http.get(url);
+  http.Response response =
+      await http.get(url, headers: {'Authorization': 'Bearer ${user.token}'});
 
   final List<dynamic> responseData = json.decode(response.body);
   List<Batch> batches = [];
@@ -56,9 +86,20 @@ class GetBatchesAction {
 
 // subject Actions
 ThunkAction<AppState> getSubjectsAction = (Store<AppState> store) async {
+  //get token
+  final prefs = await SharedPreferences.getInstance();
+  final String? storedUser = prefs.getString('user');
+
+  if (storedUser == null) {
+    return;
+  }
+
+  final User user = User.fromJson(json.decode(storedUser));
+
   var url = Uri.parse('${Strings.baseUrl}/api/subjects');
 
-  http.Response response = await http.get(url);
+  http.Response response =
+      await http.get(url, headers: {'Authorization': 'Bearer ${user.token}'});
 
   final List<dynamic> responseData = json.decode(response.body);
   List<Subject> subjects = [];
@@ -80,9 +121,19 @@ class GetSubjectsAction {
 
 // profile Actions
 ThunkAction<AppState> getProfileAction = (Store<AppState> store) async {
+  //get token
+  final prefs = await SharedPreferences.getInstance();
+  final String? storedUser = prefs.getString('user');
+
+  if (storedUser == null) {
+    return;
+  }
+
+  final User user = User.fromJson(json.decode(storedUser));
   var url = Uri.parse('${Strings.baseUrl}/api/profile');
 
-  http.Response response = await http.get(url);
+  http.Response response =
+      await http.get(url, headers: {'Authorization': 'Bearer ${user.token}'});
 
   final dynamic responseData = json.decode(response.body);
   final Profile profile = Profile.fromJson(responseData);
