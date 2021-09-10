@@ -13,7 +13,7 @@ AppState appRudecer(AppState state, dynamic action) {
       profile: profileReducer(state.profile, action));
 }
 
-User userReducer(user, action) {
+User? userReducer(User? user, dynamic action) {
   if (action is GetUserAction) {
     //return the user from action
     return action.user;
@@ -21,7 +21,7 @@ User userReducer(user, action) {
   return user;
 }
 
-List<Batch> batchesReducer(batches, action) {
+List<Batch> batchesReducer(List<Batch> batches, dynamic action) {
   if (action is GetBatchesAction) {
     //return the user from action
     return action.batches;
@@ -29,7 +29,7 @@ List<Batch> batchesReducer(batches, action) {
   return batches;
 }
 
-List<Subject> subjectsReducer(subjects, action) {
+List<Subject> subjectsReducer(List<Subject> subjects, dynamic action) {
   if (action is GetSubjectsAction) {
     //return the subjects from action
     return action.subjects;
@@ -37,7 +37,7 @@ List<Subject> subjectsReducer(subjects, action) {
   return subjects;
 }
 
-Profile profileReducer(profile, action) {
+Profile? profileReducer(Profile? profile, dynamic action) {
   if (action is GetProfileAction) {
     //return the user from action
     return action.profile;

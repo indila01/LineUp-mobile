@@ -37,12 +37,12 @@ class MyApp extends StatelessWidget {
                       .dispatch(getBatchesAction);
                   StoreProvider.of<AppState>(context)
                       .dispatch(getSubjectsAction);
-                }),
-            '/login': (BuildContext context) => LoginScreen(),
-            '/profile': (BuildContext context) => ProfileScreen(onInit: () {
+
                   StoreProvider.of<AppState>(context)
                       .dispatch(getProfileAction);
-                })
+                }),
+            '/login': (BuildContext context) => LoginScreen(),
+            '/profile': (BuildContext context) => ProfileScreen()
           },
           debugShowCheckedModeBanner: false,
           theme: ThemeData(

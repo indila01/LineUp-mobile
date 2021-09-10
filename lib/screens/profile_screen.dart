@@ -7,8 +7,7 @@ import 'package:http/http.dart' as http;
 import 'package:line_up_mobile/models/app_state.dart';
 
 class ProfileScreen extends StatefulWidget {
-  final void Function() onInit;
-  ProfileScreen({required this.onInit});
+  const ProfileScreen({Key? key}) : super(key: key);
 
   @override
   _ProfileScreenState createState() => _ProfileScreenState();
@@ -18,7 +17,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   void initState() {
     super.initState();
-    widget.onInit();
   }
 
   final _formkey = GlobalKey<FormState>();
