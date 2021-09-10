@@ -25,12 +25,14 @@ ThunkAction<AppState> getUserAction = (Store<AppState> store) async {
 ThunkAction<AppState> logoutUserAction = (Store<AppState> store) async {
   final prefs = await SharedPreferences.getInstance();
   await prefs.remove('user');
-  await prefs.remove('batches');
-  await prefs.remove('subjects');
-  await prefs.remove('profile');
-  User? user;
 
-  store.dispatch(LogoutUserAction(user));
+  User? user;
+  List<Profile>? students = [];
+
+  store.dispatch(LogoutUserAction(
+    user,
+    students,
+  ));
 };
 
 class GetUserAction {
@@ -43,10 +45,15 @@ class GetUserAction {
 
 class LogoutUserAction {
   final User? _user;
+  final List<Profile>? _students;
 
   User? get user => this._user;
+  List<Profile>? get students => this._students;
 
-  LogoutUserAction(this._user);
+  LogoutUserAction(
+    this._user,
+    this._students,
+  );
 }
 
 // batches Actions
@@ -148,4 +155,44 @@ class GetProfileAction {
   // get profile => this._profile;
 
   GetProfileAction(this._profile);
+}
+
+//student actions
+ThunkAction<AppState> getStudentsAction = (Store<AppState> store) async {
+//get token
+  final prefs = await SharedPreferences.getInstance();
+  final String? storedUser = prefs.getString('user');
+
+  if (storedUser == null) {
+    return;
+  }
+
+  final User user = User.fromJson(json.decode(storedUser));
+
+  //check if not student
+  if (user.role == 'STUDENT') {
+    return;
+  }
+
+  var url = Uri.parse('${Strings.baseUrl}/api/students');
+
+  http.Response response =
+      await http.get(url, headers: {'Authorization': 'Bearer ${user.token}'});
+
+  final List<dynamic> responseData = json.decode(response.body);
+  List<Profile> students = [];
+
+  responseData.forEach((studentData) {
+    final Profile student = Profile.fromJson(studentData);
+    students.add(student);
+  });
+  store.dispatch(GetStudentsAction(students));
+};
+
+class GetStudentsAction {
+  final List<Profile> _students;
+
+  List<Profile> get students => this._students;
+
+  GetStudentsAction(this._students);
 }

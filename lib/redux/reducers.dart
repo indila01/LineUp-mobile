@@ -10,6 +10,7 @@ AppState appRudecer(AppState state, dynamic action) {
       user: userReducer(state.user, action),
       batches: batchesReducer(state.batches, action),
       subjects: subjectsReducer(state.subjects, action),
+      students: studentsReducer(state.students, action),
       profile: profileReducer(state.profile, action));
 }
 
@@ -45,4 +46,14 @@ Profile? profileReducer(Profile? profile, dynamic action) {
     return action.profile;
   }
   return profile;
+}
+
+List<Profile> studentsReducer(List<Profile> students, dynamic action) {
+  if (action is GetStudentsAction) {
+    //return the students from action
+    return action.students;
+  } else if (action is LogoutUserAction) {
+    return [];
+  }
+  return students;
 }

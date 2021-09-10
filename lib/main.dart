@@ -37,7 +37,8 @@ class MyApp extends StatelessWidget {
                       .dispatch(getBatchesAction);
                   StoreProvider.of<AppState>(context)
                       .dispatch(getSubjectsAction);
-
+                  StoreProvider.of<AppState>(context)
+                      .dispatch(getStudentsAction);
                   StoreProvider.of<AppState>(context)
                       .dispatch(getProfileAction);
                 }),
