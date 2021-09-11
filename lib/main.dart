@@ -3,6 +3,7 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:line_up_mobile/models/app_state.dart';
 import 'package:line_up_mobile/redux/actions.dart';
 import 'package:line_up_mobile/redux/reducers.dart';
+import 'package:line_up_mobile/screens/batch_lectures_screen.dart';
 import 'package:line_up_mobile/screens/home_screen.dart';
 import 'package:line_up_mobile/screens/calender.dart';
 import 'package:line_up_mobile/screens/login_screen.dart';
@@ -43,7 +44,8 @@ class MyApp extends StatelessWidget {
                       .dispatch(getProfileAction);
                 }),
             '/login': (BuildContext context) => LoginScreen(),
-            '/profile': (BuildContext context) => ProfileScreen()
+            '/profile': (BuildContext context) => ProfileScreen(),
+            '/lectures': (BuildContext context) => BatchLecturesScreen()
           },
           debugShowCheckedModeBanner: false,
           theme: ThemeData(

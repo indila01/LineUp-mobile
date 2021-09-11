@@ -1,11 +1,14 @@
 import 'dart:convert';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:line_up_mobile/constants/Strings.dart';
 import 'package:line_up_mobile/models/app_state.dart';
 import 'package:line_up_mobile/models/batch.dart';
+import 'package:line_up_mobile/models/classroom.dart';
 import 'package:line_up_mobile/models/profile.dart';
 import 'package:line_up_mobile/models/subject.dart';
 import 'package:line_up_mobile/models/user.dart';
+import 'package:line_up_mobile/screens/batch_lectures_screen.dart';
 
 import 'package:redux_thunk/redux_thunk.dart';
 import 'package:redux/redux.dart';
@@ -195,4 +198,44 @@ class GetStudentsAction {
   List<Profile> get students => this._students;
 
   GetStudentsAction(this._students);
+}
+
+//student actions
+ThunkAction<AppState> batchTimeTableAction(BuildContext context, int id) {
+//get tokenre
+  return (Store<AppState> store) async {
+    final prefs = await SharedPreferences.getInstance();
+    final String? storedUser = prefs.getString('user');
+
+    if (storedUser == null) {
+      return;
+    }
+
+    final User user = User.fromJson(json.decode(storedUser));
+
+    var url = Uri.parse('${Strings.baseUrl}/api/classrooms/bybatch/$id');
+
+    http.Response response =
+        await http.get(url, headers: {'Authorization': 'Bearer ${user.token}'});
+
+    final List<dynamic> responseData = json.decode(response.body);
+    List<Classroom> classrooms = [];
+
+    responseData.forEach((classroomData) {
+      final Classroom classroom = Classroom.fromJson(classroomData);
+      classrooms.add(classroom);
+    });
+    store.dispatch(GetClassroomsAction(classrooms));
+    // Navigator.push(context,
+    //     MaterialPageRoute(builder: (context) => BatchLecturesScreen()));
+    // Navigator.of(context).push(return batchle);
+  };
+}
+
+class GetClassroomsAction {
+  final List<Classroom> _classrooms;
+
+  List<Classroom> get classrooms => this._classrooms;
+
+  GetClassroomsAction(this._classrooms);
 }

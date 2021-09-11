@@ -1,5 +1,6 @@
 import 'package:line_up_mobile/models/app_state.dart';
 import 'package:line_up_mobile/models/batch.dart';
+import 'package:line_up_mobile/models/classroom.dart';
 import 'package:line_up_mobile/models/profile.dart';
 import 'package:line_up_mobile/models/subject.dart';
 import 'package:line_up_mobile/models/user.dart';
@@ -11,7 +12,8 @@ AppState appRudecer(AppState state, dynamic action) {
       batches: batchesReducer(state.batches, action),
       subjects: subjectsReducer(state.subjects, action),
       students: studentsReducer(state.students, action),
-      profile: profileReducer(state.profile, action));
+      profile: profileReducer(state.profile, action),
+      classrooms: classroomsReducer(state.classrooms, action));
 }
 
 User? userReducer(User? user, dynamic action) {
@@ -56,4 +58,12 @@ List<Profile> studentsReducer(List<Profile> students, dynamic action) {
     return [];
   }
   return students;
+}
+
+List<Classroom> classroomsReducer(List<Classroom> classrooms, dynamic action) {
+  if (action is GetClassroomsAction) {
+    //return the students from action
+    return action.classrooms;
+  }
+  return classrooms;
 }
