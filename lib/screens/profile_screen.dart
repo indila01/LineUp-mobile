@@ -120,7 +120,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 )
               : ElevatedButton(
                   child: Text(
-                    'Login',
+                    'Update',
                     style: Theme.of(context)
                         .textTheme
                         .bodyText1!
@@ -210,6 +210,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 builder: (context, state) {
                   return Column(
                     children: [
+                      Text(
+                        'Update profile',
+                        style: Theme.of(context).textTheme.headline5,
+                      ),
                       _showFirstNameInput(state),
                       _showLastNameInput(state),
                       _showUserNameInput(state),

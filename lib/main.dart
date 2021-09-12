@@ -8,6 +8,7 @@ import 'package:line_up_mobile/screens/home_screen.dart';
 import 'package:line_up_mobile/screens/calender.dart';
 import 'package:line_up_mobile/screens/login_screen.dart';
 import 'package:line_up_mobile/screens/profile_screen.dart';
+import 'package:line_up_mobile/screens/schedule_timetable_screen.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_logging/redux_logging.dart';
 import 'package:redux_thunk/redux_thunk.dart';
@@ -45,7 +46,9 @@ class MyApp extends StatelessWidget {
                 }),
             '/login': (BuildContext context) => LoginScreen(),
             '/profile': (BuildContext context) => ProfileScreen(),
-            '/lectures': (BuildContext context) => BatchLecturesScreen()
+            '/lectures': (BuildContext context) => BatchLecturesScreen(),
+            '/classroomform': (BuildContext context) =>
+                ScheduleTimeTableScreen()
           },
           debugShowCheckedModeBanner: false,
           theme: ThemeData(

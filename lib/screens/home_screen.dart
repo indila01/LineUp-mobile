@@ -3,6 +3,7 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:line_up_mobile/models/app_state.dart';
 import 'package:line_up_mobile/redux/actions.dart';
 import 'package:line_up_mobile/screens/batch_screen.dart';
+import 'package:line_up_mobile/screens/schedule_timetable_screen.dart';
 import 'package:line_up_mobile/screens/student_screen.dart';
 import 'package:line_up_mobile/screens/subject_screen.dart';
 import 'package:line_up_mobile/screens/timetable_screen.dart';
@@ -20,7 +21,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final List<Widget> _children = [
     BatchScreen(),
     SubjectScreen(),
-    TimetableScreen(),
+    TimeTableScreen(),
     StudentScreen()
   ];
 

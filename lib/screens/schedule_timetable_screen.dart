@@ -1,25 +1,18 @@
-import 'package:intl/intl.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
-import 'package:line_up_mobile/constants/Strings.dart';
-import 'package:http/http.dart' as http;
 import 'package:line_up_mobile/models/app_state.dart';
 import 'package:line_up_mobile/models/subject.dart';
+import 'package:intl/intl.dart';
 
-class TimeTableScreen extends StatefulWidget {
-  const TimeTableScreen({Key? key}) : super(key: key);
+class ScheduleTimeTableScreen extends StatefulWidget {
+  ScheduleTimeTableScreen({Key? key}) : super(key: key);
 
   @override
-  _TimeTableScreenState createState() => _TimeTableScreenState();
+  _ScheduleTimeTableScreenState createState() =>
+      _ScheduleTimeTableScreenState();
 }
 
-class _TimeTableScreenState extends State<TimeTableScreen> {
-  @override
-  void initState() {
-    super.initState();
-  }
-
+class _ScheduleTimeTableScreenState extends State<ScheduleTimeTableScreen> {
   final _formkey = GlobalKey<FormState>();
   final _scafoldKey = GlobalKey<ScaffoldState>();
 
@@ -31,7 +24,7 @@ class _TimeTableScreenState extends State<TimeTableScreen> {
   String? _classname, _subject, _date, _startTime, _endTime;
   bool? _isSubmitting;
 
-  Widget _showBatchInput(state) {
+  Widget _showClassnameInput(state) {
     return Padding(
         padding: EdgeInsets.only(top: 20.0),
         child: TextFormField(
@@ -80,6 +73,108 @@ class _TimeTableScreenState extends State<TimeTableScreen> {
         ));
   }
 
+  Widget _showStartTimeInput(state) {
+    return Padding(
+        padding: EdgeInsets.only(top: 20.0),
+        child: TextFormField(
+          readOnly: true,
+          onSaved: (val) => _startTime = val!,
+          validator: (val) => val!.length < 1 ? 'Invalid start time' : null,
+          controller: startTimeInput,
+          onTap: () async {
+            TimeOfDay? pickedTime = await showTimePicker(
+                context: context, initialTime: TimeOfDay.now());
+            pickedTime != null
+                ? setState(() {
+                    startTimeInput.text = DateFormat("HH:mm").format(DateTime(
+                        DateTime.now().year,
+                        DateTime.now().month,
+                        DateTime.now().day,
+                        pickedTime.hour,
+                        pickedTime.minute));
+                  })
+                : setState(() {
+                    startTimeInput.text = '';
+                  });
+          },
+          decoration: InputDecoration(
+            border: OutlineInputBorder(),
+            labelText: 'Start time',
+            hintText: 'Enter Start time',
+          ),
+        ));
+  }
+
+  Widget _showEndTimeInput(state) {
+    return Padding(
+        padding: EdgeInsets.only(top: 20.0),
+        child: TextFormField(
+          readOnly: true,
+          onSaved: (val) => _endTime = val!,
+          validator: (val) => val!.length < 1 ? 'Invalid end time' : null,
+          controller: endTimeInput,
+          onTap: () async {
+            TimeOfDay? pickedTime = await showTimePicker(
+                context: context, initialTime: TimeOfDay.now());
+            pickedTime != null
+                ? setState(() {
+                    endTimeInput.text = DateFormat("HH:mm").format(DateTime(
+                        DateTime.now().year,
+                        DateTime.now().month,
+                        DateTime.now().day,
+                        pickedTime.hour,
+                        pickedTime.minute));
+                  })
+                : setState(() {
+                    endTimeInput.text = '';
+                  });
+          },
+          decoration: InputDecoration(
+            border: OutlineInputBorder(),
+            labelText: 'End time',
+            hintText: 'Invalid end time',
+          ),
+        ));
+  }
+
+  Widget _showSubjectInput(state) {
+    List<Subject> subjects = state.subjects;
+    List<String> subjectlist = subjects.map((Subject s) => s.name).toList();
+    return Padding(
+      padding: EdgeInsets.only(top: 20.0),
+      child: DropdownButtonFormField(
+        value: _chosenValue,
+        decoration: InputDecoration(
+          border: OutlineInputBorder(),
+          labelText: 'Subject',
+          hintText: 'Enter subject ',
+        ),
+        items: subjectlist.map<DropdownMenuItem<String>>((String value) {
+          return DropdownMenuItem<String>(
+            value: value,
+            child: Text(
+              value,
+            ),
+          );
+        }).toList(),
+        onChanged: (value) {
+          setState(() {
+            _chosenValue = value.toString();
+          });
+        },
+      ),
+      // child: TextFormField(
+      //   onSaved: (val) => _subject = val!,
+      //   validator: (val) => val!.length < 1 ? 'classname too short' : null,
+      //   decoration: InputDecoration(
+      //     border: OutlineInputBorder(),
+      //     labelText: 'Subject',
+      //     hintText: 'Enter subject ',
+      //   ),
+      // )
+    );
+  }
+
   Widget _showFormActions() {
     return Padding(
       padding: EdgeInsets.only(top: 20.0),
@@ -92,7 +187,7 @@ class _TimeTableScreenState extends State<TimeTableScreen> {
                 )
               : ElevatedButton(
                   child: Text(
-                    'Search',
+                    'Schedule class',
                     style: Theme.of(context)
                         .textTheme
                         .bodyText1!
@@ -100,26 +195,6 @@ class _TimeTableScreenState extends State<TimeTableScreen> {
                   ),
                   onPressed: _submit,
                 )
-        ],
-      ),
-    );
-  }
-
-  Widget _showCreateClassroomButton() {
-    return Padding(
-      padding: EdgeInsets.only(top: 20.0),
-      child: Column(
-        children: [
-          ElevatedButton(
-            child: Text(
-              'Create classroom',
-              style: Theme.of(context)
-                  .textTheme
-                  .bodyText1!
-                  .copyWith(color: Colors.black),
-            ),
-            onPressed: () => Navigator.pushNamed(context, '/classroomform'),
-          )
         ],
       ),
     );
@@ -185,6 +260,7 @@ class _TimeTableScreenState extends State<TimeTableScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scafoldKey,
+      appBar: AppBar(title: Text('Schedule class')),
       body: Container(
         padding: EdgeInsets.symmetric(horizontal: 20.0),
         child: Center(
@@ -196,16 +272,15 @@ class _TimeTableScreenState extends State<TimeTableScreen> {
                 builder: (context, state) {
                   return Column(
                     children: [
-                      _showCreateClassroomButton(),
                       Text(
                         'Schedule classroom',
                         style: Theme.of(context).textTheme.headline5,
                       ),
-                      _showBatchInput(state),
+                      _showClassnameInput(state),
                       _showDateInput(state),
-                      // _showStartTimeInput(state),
-                      // _showEndTimeInput(state),
-                      // _showSubjectInput(state),
+                      _showStartTimeInput(state),
+                      _showEndTimeInput(state),
+                      _showSubjectInput(state),
                       // Text(state.subjects['name']),
                       _showFormActions(),
                     ],
