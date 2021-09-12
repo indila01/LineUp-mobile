@@ -6,6 +6,8 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:line_up_mobile/constants/Strings.dart';
 import 'package:http/http.dart' as http;
 import 'package:line_up_mobile/models/app_state.dart';
+import 'package:line_up_mobile/models/user.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({Key? key}) : super(key: key);
@@ -144,20 +146,31 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   void _updateProfile() async {
     setState(() => _isSubmitting = true);
+    final prefs = await SharedPreferences.getInstance();
+    final String? storedUser = prefs.getString('user');
+    if (storedUser != null) {
+      final User user = User.fromJson(json.decode(storedUser));
 
-    var url = Uri.parse('${Strings.baseUrl}/api/password');
-    http.Response response = await http.put(url,
-        body: jsonEncode({"username": _username, "password": _password}),
-        headers: {
-          'Content-type': 'application/json',
-          'Accept': 'application/json',
-        });
-    if (response.statusCode == 200) {
-      // final responseData = json.decode(response.body);
-      setState(() => _isSubmitting = false);
-      _showSuccessSnack();
-      _redirectUser();
-      // print(responseData);
+      var url = Uri.parse('${Strings.baseUrl}/api/password');
+      http.Response response = await http.put(url,
+          body: jsonEncode({"username": _username, "password": _password}),
+          headers: {
+            'Content-type': 'application/json',
+            'Accept': 'application/json',
+            'Authorization': 'Bearer ${user.token}'
+          });
+      if (response.statusCode == 200) {
+        // final responseData = json.decode(response.body);
+        setState(() => _isSubmitting = false);
+        _showSuccessSnack();
+        _redirectUser();
+        // print(responseData);
+      } else {
+        setState(() => _isSubmitting = false);
+        final String errorMsg = 'Error Update password';
+
+        _showErrorSnack(errorMsg);
+      }
     } else {
       setState(() => _isSubmitting = false);
       final String errorMsg = 'Error Update password';

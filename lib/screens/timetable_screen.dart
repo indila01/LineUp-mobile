@@ -24,8 +24,6 @@ class _TimeTableScreenState extends State<TimeTableScreen> {
   final _scafoldKey = GlobalKey<ScaffoldState>();
 
   TextEditingController dateinput = TextEditingController();
-  TextEditingController startTimeInput = TextEditingController();
-  TextEditingController endTimeInput = TextEditingController();
   String? _chosenValue;
 
   String? _classname, _subject, _date, _startTime, _endTime;
@@ -196,7 +194,8 @@ class _TimeTableScreenState extends State<TimeTableScreen> {
                 builder: (context, state) {
                   return Column(
                     children: [
-                      _showCreateClassroomButton(),
+                      if (state.user != null && state.user.role != 'STUDENT')
+                        _showCreateClassroomButton(),
                       Text(
                         'Schedule classroom',
                         style: Theme.of(context).textTheme.headline5,

@@ -71,7 +71,7 @@ ThunkAction<AppState> getBatchesAction = (Store<AppState> store) async {
 
   final User user = User.fromJson(json.decode(storedUser));
 
-  var url = Uri.parse('${Strings.baseUrl}/api/batches');
+  var url = Uri.parse('${Strings.baseUrl}/api/batches/all');
 
   http.Response response =
       await http.get(url, headers: {'Authorization': 'Bearer ${user.token}'});
@@ -106,7 +106,7 @@ ThunkAction<AppState> getSubjectsAction = (Store<AppState> store) async {
 
   final User user = User.fromJson(json.decode(storedUser));
 
-  var url = Uri.parse('${Strings.baseUrl}/api/subjects');
+  var url = Uri.parse('${Strings.baseUrl}/api/subjects/all');
 
   http.Response response =
       await http.get(url, headers: {'Authorization': 'Bearer ${user.token}'});
@@ -177,7 +177,7 @@ ThunkAction<AppState> getStudentsAction = (Store<AppState> store) async {
     return;
   }
 
-  var url = Uri.parse('${Strings.baseUrl}/api/students');
+  var url = Uri.parse('${Strings.baseUrl}/api/students/all');
 
   http.Response response =
       await http.get(url, headers: {'Authorization': 'Bearer ${user.token}'});
@@ -213,7 +213,7 @@ ThunkAction<AppState> batchTimeTableAction(BuildContext context, int id) {
 
     final User user = User.fromJson(json.decode(storedUser));
 
-    var url = Uri.parse('${Strings.baseUrl}/api/classrooms/bybatch/$id');
+    var url = Uri.parse('${Strings.baseUrl}/api/classrooms/bybatch/all/$id');
 
     http.Response response =
         await http.get(url, headers: {'Authorization': 'Bearer ${user.token}'});

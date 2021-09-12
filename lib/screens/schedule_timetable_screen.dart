@@ -1,8 +1,13 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
+import 'package:line_up_mobile/constants/Strings.dart';
 import 'package:line_up_mobile/models/app_state.dart';
 import 'package:line_up_mobile/models/subject.dart';
 import 'package:intl/intl.dart';
+import 'package:http/http.dart' as http;
+import 'package:line_up_mobile/models/user.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ScheduleTimeTableScreen extends StatefulWidget {
   ScheduleTimeTableScreen({Key? key}) : super(key: key);
@@ -19,7 +24,6 @@ class _ScheduleTimeTableScreenState extends State<ScheduleTimeTableScreen> {
   TextEditingController dateinput = TextEditingController();
   TextEditingController startTimeInput = TextEditingController();
   TextEditingController endTimeInput = TextEditingController();
-  String? _chosenValue;
 
   String? _classname, _subject, _date, _startTime, _endTime;
   bool? _isSubmitting;
@@ -143,7 +147,8 @@ class _ScheduleTimeTableScreenState extends State<ScheduleTimeTableScreen> {
     return Padding(
       padding: EdgeInsets.only(top: 20.0),
       child: DropdownButtonFormField(
-        value: _chosenValue,
+        validator: (val) => val == null ? 'Select subject' : null,
+        value: _subject,
         decoration: InputDecoration(
           border: OutlineInputBorder(),
           labelText: 'Subject',
@@ -159,19 +164,10 @@ class _ScheduleTimeTableScreenState extends State<ScheduleTimeTableScreen> {
         }).toList(),
         onChanged: (value) {
           setState(() {
-            _chosenValue = value.toString();
+            _subject = value.toString();
           });
         },
       ),
-      // child: TextFormField(
-      //   onSaved: (val) => _subject = val!,
-      //   validator: (val) => val!.length < 1 ? 'classname too short' : null,
-      //   decoration: InputDecoration(
-      //     border: OutlineInputBorder(),
-      //     labelText: 'Subject',
-      //     hintText: 'Enter subject ',
-      //   ),
-      // )
     );
   }
 
@@ -205,32 +201,50 @@ class _ScheduleTimeTableScreenState extends State<ScheduleTimeTableScreen> {
 
     if (form!.validate()) {
       form.save();
-      _updateProfile();
+      _createClassroom();
     }
   }
 
-  void _updateProfile() async {
-    // setState(() => _isSubmitting = true);
+  void _createClassroom() async {
+    setState(() => _isSubmitting = true);
+    final prefs = await SharedPreferences.getInstance();
+    final String? storedUser = prefs.getString('user');
 
-    // var url = Uri.parse('${Strings.baseUrl}/api/password');
-    // http.Response response = await http.put(url,
-    //     body: jsonEncode({"username": _username, "password": _password}),
-    //     headers: {
-    //       'Content-type': 'application/json',
-    //       'Accept': 'application/json',
-    //     });
-    // if (response.statusCode == 200) {
-    //   // final responseData = json.decode(response.body);
-    //   setState(() => _isSubmitting = false);
-    //   _showSuccessSnack();
-    //   _redirectUser();
-    //   // print(responseData);
-    // } else {
-    //   setState(() => _isSubmitting = false);
-    //   final String errorMsg = 'Error Update password';
+    if (storedUser != null) {
+      final User user = User.fromJson(json.decode(storedUser));
 
-    //   _showErrorSnack(errorMsg);
-    // }
+      var url = Uri.parse('${Strings.baseUrl}/api/classrooms/create');
+      http.Response response = await http.post(url,
+          body: jsonEncode({
+            "className": _classname,
+            "startTime": _startTime,
+            "endTime": _endTime,
+            "date": _date,
+            "subject": _subject
+          }),
+          headers: {
+            'Content-type': 'application/json',
+            'Accept': 'application/json',
+            'Authorization': 'Bearer ${user.token}'
+          });
+      if (response.statusCode == 200) {
+        final responseData = response.body;
+        setState(() => _isSubmitting = false);
+        _showSuccessSnack();
+        _redirectUser();
+        print(responseData);
+      } else {
+        setState(() => _isSubmitting = false);
+        final String errorMsg = 'Error Creating Schedule';
+
+        _showErrorSnack(errorMsg);
+      }
+    } else {
+      setState(() => _isSubmitting = false);
+      final String errorMsg = 'Error Creating Schedule';
+
+      _showErrorSnack(errorMsg);
+    }
   }
 
   void _showSuccessSnack() {
