@@ -5,7 +5,9 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:line_up_mobile/constants/Strings.dart';
 import 'package:http/http.dart' as http;
 import 'package:line_up_mobile/models/app_state.dart';
+import 'package:line_up_mobile/models/batch.dart';
 import 'package:line_up_mobile/models/subject.dart';
+import 'package:line_up_mobile/redux/actions.dart';
 
 class TimeTableScreen extends StatefulWidget {
   const TimeTableScreen({Key? key}) : super(key: key);
@@ -24,23 +26,38 @@ class _TimeTableScreenState extends State<TimeTableScreen> {
   final _scafoldKey = GlobalKey<ScaffoldState>();
 
   TextEditingController dateinput = TextEditingController();
-  String? _chosenValue;
 
-  String? _classname, _subject, _date, _startTime, _endTime;
+  String? _classname, _batch, _date, _startTime, _endTime;
   bool? _isSubmitting;
 
   Widget _showBatchInput(state) {
+    List<Batch> batches = state.batches;
+    List<String> batchList = batches.map((Batch b) => b.batchCode).toList();
     return Padding(
-        padding: EdgeInsets.only(top: 20.0),
-        child: TextFormField(
-          onSaved: (val) => _classname = val!,
-          validator: (val) => val!.length < 1 ? 'Classname too short' : null,
-          decoration: InputDecoration(
-            border: OutlineInputBorder(),
-            labelText: 'Classname',
-            hintText: 'Enter classname',
-          ),
-        ));
+      padding: EdgeInsets.only(top: 20.0),
+      child: DropdownButtonFormField(
+        validator: (val) => val == null ? 'Select batch' : null,
+        value: _batch,
+        decoration: InputDecoration(
+          border: OutlineInputBorder(),
+          labelText: 'Batch',
+          hintText: 'Enter batch',
+        ),
+        items: batchList.map<DropdownMenuItem<String>>((String value) {
+          return DropdownMenuItem<String>(
+            value: value,
+            child: Text(
+              value,
+            ),
+          );
+        }).toList(),
+        onChanged: (value) {
+          setState(() {
+            _batch = value.toString();
+          });
+        },
+      ),
+    );
   }
 
   Widget _showDateInput(state) {
@@ -68,8 +85,6 @@ class _TimeTableScreenState extends State<TimeTableScreen> {
                     dateinput.text = '';
                   });
           },
-          // onSaved: (val) => _date,
-          // validator: (val) => val!.length < 1 ? 'Invalid Date' : null,
           decoration: InputDecoration(
             border: OutlineInputBorder(),
             labelText: 'Date',
@@ -80,27 +95,22 @@ class _TimeTableScreenState extends State<TimeTableScreen> {
 
   Widget _showFormActions() {
     return Padding(
-      padding: EdgeInsets.only(top: 20.0),
-      child: Column(
-        children: [
-          _isSubmitting == true
-              ? CircularProgressIndicator(
-                  valueColor:
-                      AlwaysStoppedAnimation(Theme.of(context).accentColor),
-                )
-              : ElevatedButton(
-                  child: Text(
-                    'Search',
-                    style: Theme.of(context)
-                        .textTheme
-                        .bodyText1!
-                        .copyWith(color: Colors.black),
-                  ),
-                  onPressed: _submit,
-                )
-        ],
-      ),
-    );
+        padding: EdgeInsets.only(top: 20.0),
+        child: StoreConnector<AppState, AppState>(
+          converter: (store) => store.state,
+          builder: (_, callback) {
+            return ElevatedButton(
+              child: Text(
+                'Search',
+                style: Theme.of(context)
+                    .textTheme
+                    .bodyText1!
+                    .copyWith(color: Colors.black),
+              ),
+              onPressed: _submit,
+            );
+          },
+        ));
   }
 
   Widget _showCreateClassroomButton() {
@@ -123,60 +133,15 @@ class _TimeTableScreenState extends State<TimeTableScreen> {
     );
   }
 
-  void _submit() {
+  void _submit() async {
+    final store = StoreProvider.of<AppState>(context);
     final form = _formkey.currentState;
 
     if (form!.validate()) {
       form.save();
-      _updateProfile();
+      await store.dispatch(batchTimeTableDateAction(context, _batch!, _date!));
+      Navigator.pushNamed(context, '/lectures');
     }
-  }
-
-  void _updateProfile() async {
-    // setState(() => _isSubmitting = true);
-
-    // var url = Uri.parse('${Strings.baseUrl}/api/password');
-    // http.Response response = await http.put(url,
-    //     body: jsonEncode({"username": _username, "password": _password}),
-    //     headers: {
-    //       'Content-type': 'application/json',
-    //       'Accept': 'application/json',
-    //     });
-    // if (response.statusCode == 200) {
-    //   // final responseData = json.decode(response.body);
-    //   setState(() => _isSubmitting = false);
-    //   _showSuccessSnack();
-    //   _redirectUser();
-    //   // print(responseData);
-    // } else {
-    //   setState(() => _isSubmitting = false);
-    //   final String errorMsg = 'Error Update password';
-
-    //   _showErrorSnack(errorMsg);
-    // }
-  }
-
-  void _showSuccessSnack() {
-    final snackBar = SnackBar(
-        content:
-            Text('Schedule created', style: TextStyle(color: Colors.green)));
-    ScaffoldMessenger.maybeOf(context)!.showSnackBar(snackBar);
-
-    _formkey.currentState!.reset();
-  }
-
-  void _showErrorSnack(String errorMsg) {
-    final snackBar =
-        SnackBar(content: Text(errorMsg, style: TextStyle(color: Colors.red)));
-    ScaffoldMessenger.maybeOf(context)!.showSnackBar(snackBar);
-
-    throw Exception('Schedule create fail');
-  }
-
-  void _redirectUser() {
-    Future.delayed(Duration(microseconds: 50), () {
-      Navigator.pushReplacementNamed(context, '/home');
-    });
   }
 
   @override
@@ -197,15 +162,11 @@ class _TimeTableScreenState extends State<TimeTableScreen> {
                       if (state.user != null && state.user.role != 'STUDENT')
                         _showCreateClassroomButton(),
                       Text(
-                        'Schedule classroom',
+                        'Search classrooms',
                         style: Theme.of(context).textTheme.headline5,
                       ),
                       _showBatchInput(state),
                       _showDateInput(state),
-                      // _showStartTimeInput(state),
-                      // _showEndTimeInput(state),
-                      // _showSubjectInput(state),
-                      // Text(state.subjects['name']),
                       _showFormActions(),
                     ],
                   );

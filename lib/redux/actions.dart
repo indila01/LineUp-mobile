@@ -200,7 +200,7 @@ class GetStudentsAction {
   GetStudentsAction(this._students);
 }
 
-//student actions
+//classroom actions
 ThunkAction<AppState> batchTimeTableAction(BuildContext context, int id) {
 //get tokenre
   return (Store<AppState> store) async {
@@ -217,6 +217,44 @@ ThunkAction<AppState> batchTimeTableAction(BuildContext context, int id) {
 
     http.Response response =
         await http.get(url, headers: {'Authorization': 'Bearer ${user.token}'});
+
+    final List<dynamic> responseData = json.decode(response.body);
+    List<Classroom> classrooms = [];
+
+    responseData.forEach((classroomData) {
+      final Classroom classroom = Classroom.fromJson(classroomData);
+      classrooms.add(classroom);
+    });
+    store.dispatch(GetClassroomsAction(classrooms));
+    // Navigator.push(context,
+    //     MaterialPageRoute(builder: (context) => BatchLecturesScreen()));
+    // Navigator.of(context).push(return batchle);
+  };
+}
+
+//student actions
+ThunkAction<AppState> batchTimeTableDateAction(
+    BuildContext context, String batch, String date) {
+//get tokenre
+  return (Store<AppState> store) async {
+    final prefs = await SharedPreferences.getInstance();
+    final String? storedUser = prefs.getString('user');
+
+    if (storedUser == null) {
+      return;
+    }
+
+    final User user = User.fromJson(json.decode(storedUser));
+
+    var url = Uri.parse('${Strings.baseUrl}/api/classrooms/search');
+
+    http.Response response = await http.post(url,
+        body: jsonEncode({"batch": batch, "fromDate": date}),
+        headers: {
+          'Content-type': 'application/json',
+          'Accept': 'application/json',
+          'Authorization': 'Bearer ${user.token}'
+        });
 
     final List<dynamic> responseData = json.decode(response.body);
     List<Classroom> classrooms = [];
